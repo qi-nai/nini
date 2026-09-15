@@ -1,4 +1,826 @@
----
-layout: home
-title: Home
----
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#E3350D">
+<title>自我介绍 暨 相处说明书 ~ App版</title>
+<style>
+  :root{
+    --poke-red:#E3350D;
+    --poke-red-deep:#B3120E;
+    --poke-yellow:#FFCB05;
+    --poke-yellow-deep:#F2A900;
+    --poke-blue:#3C5AA6;
+    --bg:#fff7ea;
+    --paper:#ffffff;
+    --ink:#2c2a27;
+    --muted:#8a8178;
+    --line:#f1e4d2;
+    --accent-deep:var(--poke-red-deep);
+    --accent-soft:#fde3da;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:#d9d2c7;
+    color:var(--ink);
+    font-family:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    font-size:16px;
+    line-height:1.85;
+    display:flex;justify-content:center;align-items:stretch;
+  }
+  a{color:var(--accent-deep);text-decoration:none;}
+
+  /* ===== 手机外壳 ===== */
+  .phone{
+    width:100%;max-width:430px;height:100%;
+    background:
+      radial-gradient(circle, rgba(227,53,13,.05) 2px, transparent 3px) 0 0/26px 26px,
+      var(--bg);
+    display:flex;flex-direction:column;
+    position:relative;overflow:hidden;
+    box-shadow:0 0 44px rgba(60,40,20,.35);
+  }
+  @media(min-width:520px){
+    body{align-items:center;}
+    .phone{height:min(880px,94vh);border-radius:34px;border:10px solid #222;}
+  }
+
+  /* ===== 顶部 App Bar ===== */
+  .appbar{
+    flex:none;
+    padding:calc(12px + env(safe-area-inset-top)) 16px 12px;
+    background:linear-gradient(135deg,var(--poke-red),var(--poke-red-deep));
+    color:#fff;
+    display:flex;align-items:center;gap:12px;
+    border-bottom:3px solid var(--poke-yellow);
+    box-shadow:0 4px 14px rgba(179,18,14,.35);
+    z-index:10;
+  }
+  .appbar .avatar{
+    flex:none;width:42px;height:42px;border-radius:50%;
+    background:
+      radial-gradient(circle at 50% 50%, #fff 0 4px, #222 4px 6.5px, transparent 7px),
+      linear-gradient(180deg,#ff5030 0 50%, #fff 50% 100%);
+    border:2.5px solid #fff;
+    box-shadow:0 3px 8px rgba(0,0,0,.25);
+    animation:wobble 3.2s ease-in-out infinite;
+  }
+  @keyframes wobble{0%,100%{transform:rotate(-8deg);}50%{transform:rotate(8deg);}}
+  .appbar .title{flex:1;min-width:0;}
+  .appbar .title b{display:block;font-size:16px;font-weight:800;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .appbar .title span{display:block;font-size:11px;opacity:.85;letter-spacing:.12em;}
+  .appbar .badge{
+    flex:none;font-size:11px;font-weight:800;letter-spacing:.06em;
+    background:var(--poke-yellow);color:#3a2c00;
+    padding:4px 10px;border-radius:999px;border:1.5px solid rgba(0,0,0,.25);
+  }
+
+  /* ===== 内容区 ===== */
+  .content{
+    flex:1;overflow-y:auto;overscroll-behavior:contain;
+    padding:calc(16px + env(safe-area-inset-top)) 14px calc(88px + env(safe-area-inset-bottom));
+    scrollbar-width:none;
+  }
+  .content::-webkit-scrollbar{display:none;}
+
+  .screen{display:none;}
+  .screen.active{display:block;animation:fadeUp .28s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+  /* ===== 卡片 ===== */
+  .card{
+    background:var(--paper);
+    border-radius:var(--radius);
+    padding:18px 16px;
+    margin-bottom:14px;
+    box-shadow:0 4px 16px rgba(180,40,20,.09);
+    border:1px solid var(--line);
+  }
+  .card > h2{
+    font-size:18px;margin:0 0 12px;font-weight:800;
+    display:flex;align-items:center;gap:10px;color:var(--ink);
+  }
+  .mini-ball{
+    flex:none;width:22px;height:22px;border-radius:50%;
+    background:
+      radial-gradient(circle at 50% 50%, #fff 0 2.5px, #222 2.5px 4px, transparent 4.4px),
+      linear-gradient(180deg,var(--poke-red) 0 50%, #fff 50% 100%);
+    border:2px solid #222;
+  }
+  .card p{text-indent:2em;margin:0 0 12px;font-size:15.5px;}
+  .card p:last-child{margin-bottom:0;}
+  .card p.noindent{text-indent:0;}
+
+  /* ===== 个人资料头 ===== */
+  .profile{
+    text-align:center;padding:22px 16px 18px;margin-bottom:14px;
+  }
+  .profile h1{font-size:23px;margin:0 0 6px;font-weight:800;}
+  .profile .sub{font-size:13px;color:var(--muted);margin:0 0 12px;}
+  .stat-row{
+    display:flex;justify-content:center;gap:8px;flex-wrap:wrap;
+  }
+  .stat{
+    background:linear-gradient(135deg,#fff6cf,#ffe89a);
+    border:1.5px solid var(--poke-yellow-deep);
+    color:var(--accent-deep);font-weight:700;font-size:13px;
+    padding:5px 12px;border-radius:999px;
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;justify-content:center;}
+  .chip{
+    background:linear-gradient(135deg,#ffe14d,#ffcb05);
+    color:#2b2300;padding:7px 14px;border-radius:999px;
+    font-size:13.5px;font-weight:700;border:2px solid #222;
+    box-shadow:0 3px 0 rgba(34,34,34,.18);
+  }
+
+  /* ===== 设置式信息行 ===== */
+  .rows{border-radius:12px;overflow:hidden;border:1px solid var(--line);}
+  .row{
+    display:flex;gap:10px;padding:12px 14px;background:#fffaf2;
+    border-bottom:1px solid var(--line);font-size:15px;
+  }
+  .row:last-child{border-bottom:none;}
+  .row .k{flex:none;width:82px;font-weight:800;color:var(--accent-deep);font-size:14px;padding-top:1px;}
+  .row .v{flex:1;min-width:0;}
+  .row .v ul{margin:0;padding-left:18px;}
+  .row .v li{margin:3px 0;font-size:14.5px;}
+
+  /* ===== 条目列表 ===== */
+  .entry-list{list-style:none;margin:0;padding:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);}
+  .entry{
+    width:100%;display:flex;align-items:center;gap:10px;
+    padding:14px;background:#fffaf2;border:none;cursor:pointer;
+    font-family:inherit;font-size:15.5px;font-weight:700;color:var(--ink);text-align:left;
+    border-bottom:1px solid var(--line);
+  }
+  .entry-list li:last-child .entry{border-bottom:none;}
+  .entry:active{background:#ffe9d2;}
+  .entry .e-ico{flex:none;font-size:17px;line-height:1;}
+  .entry .e-txt{flex:1;min-width:0;}
+  .entry .e-arrow{flex:none;display:inline;color:var(--poke-red);font-weight:800;font-size:16px;}
+  .entry .e-lock{flex:none;display:none;font-size:13px;}
+  li.gated .entry{color:#b3a99c;}
+  li.gated .entry .e-ico{filter:grayscale(1);opacity:.55;}
+  li.gated .e-arrow{display:none;}
+  li.gated .e-lock{display:inline;}
+  li.gated.done .e-arrow{display:inline;}
+  li.gated.done .e-lock{display:none;}
+  li.gated.done .entry{color:var(--ink);}
+  li.gated.done .entry .e-ico{filter:none;opacity:1;}
+  li.prelude .entry{background:linear-gradient(135deg,#fff7d6,#ffeeb0);}
+  .gate-tip{font-size:12.5px;color:var(--muted);text-align:center;margin:10px 0 0;text-indent:0;}
+
+  /* ===== 全屏子页面 ===== */
+  .subpage{
+    position:absolute;inset:0;z-index:30;display:none;flex-direction:column;
+    background:
+      radial-gradient(circle, rgba(60,90,166,.05) 2px, transparent 3px) 0 0/26px 26px,
+      var(--bg);
+  }
+  .subpage.open{display:flex;animation:subIn .26s ease;}
+  @keyframes subIn{from{opacity:0;transform:translateX(46px);}to{opacity:1;transform:none;}}
+  .phone.in-sub .tabbar{display:none;}
+  .subbar{
+    flex:none;display:flex;align-items:center;gap:10px;
+    padding:calc(10px + env(safe-area-inset-top)) 12px 10px;
+    background:linear-gradient(135deg,var(--poke-red),var(--poke-red-deep));
+    color:#fff;border-bottom:3px solid var(--poke-yellow);
+    box-shadow:0 4px 14px rgba(179,18,14,.35);z-index:2;
+  }
+  .subback{
+    flex:none;border:none;cursor:pointer;font-family:inherit;
+    background:rgba(255,255,255,.2);color:#fff;font-weight:800;font-size:14px;
+    padding:8px 14px;border-radius:999px;display:flex;align-items:center;gap:4px;
+  }
+  .subback:active{background:rgba(255,255,255,.35);}
+  .subbar b{flex:1;min-width:0;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em;}
+  .subcontent{
+    flex:1;overflow-y:auto;overscroll-behavior:contain;
+    padding:16px 14px calc(24px + env(safe-area-inset-bottom));
+    scrollbar-width:none;
+  }
+  .subcontent::-webkit-scrollbar{display:none;}
+  .toast{
+    position:absolute;left:50%;bottom:calc(104px + env(safe-area-inset-bottom));
+    transform:translateX(-50%) translateY(10px);
+    background:rgba(44,42,39,.93);color:#fff;
+    font-size:13.5px;font-weight:700;padding:10px 18px;border-radius:999px;
+    opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:60;white-space:nowrap;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ===== 引用卡 ===== */
+  .quote{
+    margin:0 0 14px;padding:16px 18px;
+    border-left:5px solid var(--poke-blue);
+    background:#e7edf7;border-radius:0 14px 14px 0;
+    font-size:15px;color:#2f3f63;font-style:italic;
+  }
+  .quote.final{
+    border-left-color:var(--poke-yellow-deep);
+    background:linear-gradient(135deg,#fff7d6,#ffe9a8);color:var(--accent-deep);
+  }
+
+  /* ===== 情感经历 ===== */
+  .love-head{text-align:center;color:var(--muted);font-style:italic;font-size:14px;margin:0 0 4px;}
+  .love-head .big{display:block;font-size:16px;color:var(--accent-deep);font-style:normal;font-weight:800;margin-bottom:4px;}
+  .love-note{
+    padding:14px 16px;margin:10px 0 12px;
+    background:var(--accent-soft);border:2px dashed var(--poke-red);border-radius:12px;
+    text-align:center;font-weight:700;color:var(--accent-deep);font-size:14.5px;
+  }
+  ol.love{list-style:none;counter-reset:love;margin:0;padding:0;display:grid;gap:12px;}
+  ol.love li{
+    position:relative;padding:16px 14px 16px 54px;
+    background:#fffaf2;border:1px solid var(--line);border-radius:12px;
+    font-size:14.5px;text-indent:2em;
+  }
+  ol.love li::before{
+    counter-increment:love;content:counter(love);
+    position:absolute;left:12px;top:14px;width:30px;height:30px;border-radius:50%;
+    background:
+      radial-gradient(circle at 50% 50%, #fff 0 3px, #222 3px 5px, transparent 5.5px),
+      linear-gradient(180deg,var(--poke-red) 0 50%, #fff 50% 100%);
+    border:2px solid #222;color:transparent;
+  }
+  ol.love li .who{font-weight:800;color:var(--accent-deep);display:block;margin-bottom:4px;font-size:15px;}
+
+  /* ===== 密码锁 ===== */
+  .love-lock{
+    padding:24px 18px;
+    background:linear-gradient(135deg,#fff7d6,#ffe9a8);
+    border:2px dashed var(--poke-red);border-radius:12px;
+    text-align:center;
+  }
+  .love-lock .lockball{
+    width:48px;height:48px;margin:0 auto 10px;border-radius:50%;
+    background:
+      radial-gradient(circle at 50% 50%, #fff 0 5px, #222 5px 8px, transparent 8.6px),
+      linear-gradient(180deg,var(--poke-red) 0 50%, #fff 50% 100%);
+    border:3px solid #222;
+    box-shadow:0 5px 12px rgba(180,40,20,.25);
+    animation:wobble 3s ease-in-out infinite;
+  }
+  .love-lock p.tip{font-size:14.5px;color:var(--accent-deep);font-weight:700;margin:0 0 12px;line-height:1.9;text-indent:0;}
+  .love-lock .lock-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .love-lock input{
+    width:170px;padding:11px 14px;font-size:16px;
+    border:2px solid #222;border-radius:999px;outline:none;
+    background:#fff;text-align:center;letter-spacing:.35em;font-family:inherit;
+  }
+  .love-lock input:focus{border-color:var(--poke-red);box-shadow:0 0 0 3px rgba(227,53,13,.15);}
+  .love-lock button{
+    padding:11px 22px;font-size:15px;font-weight:800;color:#fff;
+    background:linear-gradient(135deg,var(--poke-red),var(--poke-red-deep));
+    border:2px solid #222;border-radius:999px;cursor:pointer;
+    font-family:inherit;box-shadow:0 4px 0 rgba(34,34,34,.22);
+  }
+  .love-lock button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(34,34,34,.22);}
+  .love-lock .lock-err{display:none;margin:10px 0 0;color:var(--poke-red-deep);font-size:13.5px;font-weight:700;text-indent:0;}
+  .love-lock.shake{animation:lockShake .4s ease;}
+  @keyframes lockShake{
+    0%,100%{transform:translateX(0);}
+    20%,60%{transform:translateX(-8px);}
+    40%,80%{transform:translateX(8px);}
+  }
+
+  /* ===== 阅读门禁 ===== */
+  .read-done{
+    display:block;width:100%;margin-top:6px;cursor:pointer;font-family:inherit;
+    padding:13px 16px;font-size:15px;font-weight:800;color:#3a2c00;
+    background:linear-gradient(135deg,#ffd84d,#ffcb05);
+    border:2px solid #222;border-radius:999px;
+    box-shadow:0 4px 0 rgba(34,34,34,.22);
+  }
+  .read-done:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(34,34,34,.22);}
+  .read-done.done{background:#efe9df;color:#8a8178;box-shadow:none;border-color:#cfc6ba;cursor:default;}
+
+  /* ===== 标签说明 ===== */
+  .note-card b.n{color:var(--accent-deep);}
+  .note-card p{text-indent:0;font-size:14.5px;}
+
+  /* ===== 脚注标记 ===== */
+  .fn{
+    color:var(--accent-deep);font-size:.78em;font-weight:800;margin-left:2px;
+    vertical-align:super;cursor:pointer;border-bottom:1px dotted var(--accent-soft);
+    user-select:none;
+  }
+
+  /* ===== 底部标签栏 ===== */
+  .tabbar{
+    flex:none;position:absolute;left:0;right:0;bottom:0;
+    display:flex;
+    padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    background:rgba(255,255,255,.96);
+    border-top:none;
+    box-shadow:0 -4px 16px rgba(180,40,20,.08);
+    backdrop-filter:blur(8px);
+    z-index:20;
+  }
+  .tab{
+    flex:1;border:none;background:none;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    font-family:inherit;color:var(--muted);font-size:11px;font-weight:700;
+    padding:4px 0 2px;border-radius:12px;position:relative;
+    transition:color .2s;
+  }
+  .tab .ico{font-size:22px;line-height:1;filter:grayscale(.6);opacity:.75;transition:.2s;}
+  .tab.active{color:var(--poke-red-deep);}
+  .tab.active .ico{filter:none;opacity:1;transform:translateY(-1px) scale(1.08);}
+  .tab.active::after{
+    content:"";position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+    width:26px;height:3px;border-radius:0 0 4px 4px;background:var(--poke-red);
+  }
+
+  /* ================= 宝可梦装饰元素 ================= */
+
+  /* 1. 卡片顶部属性色条 */
+  .card{position:relative;overflow:hidden;}
+  .card::before{
+    content:"";position:absolute;left:0;right:0;top:0;height:4px;z-index:1;
+    background:linear-gradient(90deg,var(--poke-red) 0 34%,var(--poke-yellow) 34% 67%,var(--poke-blue) 67% 100%);
+    opacity:.9;
+  }
+  .card.leaf::before{background:linear-gradient(90deg,#4FAB4A 0 34%,#8FD07A 34% 67%,#CFE8B8 67% 100%);}
+  .card.water::before{background:linear-gradient(90deg,#2E7FD1 0 34%,#79C4F2 34% 67%,#CDEAFB 67% 100%);}
+  .card.romance::before{background:linear-gradient(90deg,#F08030 0 34%,#F8D030 34% 67%,#C898F8 67% 100%);}
+  .profile::before{border-radius:calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;}
+
+  /* 2. ⚡ 皮卡丘闪电背景水印 */
+  .content{position:relative;z-index:1;}
+  .phone::before,.phone::after{
+    content:"⚡";position:absolute;pointer-events:none;z-index:0;user-select:none;
+    font-size:190px;line-height:1;
+  }
+  .phone::before{right:-34px;top:150px;color:rgba(227,53,13,.055);transform:rotate(14deg);}
+  .phone::after{left:-36px;bottom:190px;color:rgba(60,90,166,.06);transform:rotate(-16deg);}
+
+  /* 3. 精灵球分隔线 */
+  .poke-sep{display:flex;align-items:center;gap:12px;margin:16px 2px 18px;}
+  .poke-sep i{flex:1;height:3px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(227,53,13,.32),transparent);}
+  .poke-sep .sep-ball{
+    flex:none;width:24px;height:24px;border-radius:50%;border:2px solid #222;
+    background:
+      radial-gradient(circle at 50% 50%, #fff 0 3px, #222 3px 5px, transparent 5.6px),
+      linear-gradient(180deg,var(--poke-red) 0 50%, #fff 50% 100%);
+    box-shadow:0 2px 6px rgba(180,40,20,.18);
+    animation:wobble 3.6s ease-in-out infinite;
+  }
+
+  /* 4. 精灵球家族排（精灵球 / 超级球 / 高级球 / 大师球） */
+  .ball-family{display:flex;justify-content:center;align-items:center;gap:16px;margin:18px 0 6px;}
+  .ball-family .b{
+    flex:none;width:26px;height:26px;border-radius:50%;border:2px solid #222;position:relative;
+    box-shadow:0 3px 8px rgba(180,40,20,.18);
+    animation:wobble 3.4s ease-in-out infinite;
+  }
+  .ball-family .b::after{
+    content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:9px;height:9px;border-radius:50%;background:#fff;border:2px solid #222;
+  }
+  .ball-family .b:nth-child(1){background:linear-gradient(180deg,var(--poke-red) 0 50%,#fff 50% 100%);}
+  .ball-family .b:nth-child(2){background:linear-gradient(180deg,#3C5AA6 0 40%,var(--poke-red) 40% 58%,#fff 58% 100%);animation-delay:.5s;}
+  .ball-family .b:nth-child(3){background:linear-gradient(180deg,#2B2B2B 0 46%,#fff 46% 100%);animation-delay:1s;}
+  .ball-family .b:nth-child(4){background:linear-gradient(180deg,#8E5AA6 0 50%,#fff 50% 100%);animation-delay:1.5s;}
+
+  /* 5. 子页面标题栏小球 */
+  .subball{
+    flex:none;width:22px;height:22px;border-radius:50%;border:2px solid #fff;
+    background:
+      radial-gradient(circle at 50% 50%, #fff 0 2.5px, #222 2.5px 4px, transparent 4.6px),
+      linear-gradient(180deg,#ff5030 0 50%, #fff 50% 100%);
+    animation:wobble 3.2s ease-in-out infinite;
+  }
+
+  /* 主页标题两侧小闪电 */
+  .profile h1 .bolt{
+    display:inline-block;font-size:14px;margin:0 4px;
+    animation:blinkBolt 2.6s ease-in-out infinite;
+  }
+  .profile h1 .bolt:nth-of-type(2){animation-delay:1.3s;}
+  @keyframes blinkBolt{
+    0%,100%{opacity:.35;transform:scale(.88);}
+    50%{opacity:1;transform:scale(1.15);}
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <main class="content">
+
+    <!-- ========== Tab 1 主页 ========== -->
+    <section class="screen active" id="tab-home">
+      <div class="card profile">
+        <h1><span class="bolt">⚡</span>自我介绍 暨 相处说明书<span class="bolt">⚡</span></h1>
+        <p class="sub">关于我，以及我想让你知道的那些事</p>
+        <div class="stat-row">
+          <span class="stat">♂️ 1995/8</span>
+          <span class="stat">163CM 60KG</span>
+          <span class="stat">广西 南宁</span>
+        </div>
+        <p class="sub" style="margin:10px 0 0;">人是非常复杂的，标签虽不完全准确，但标签还是能够方便认清自己也方便他人了解自己。</p>
+        <div class="chips">
+          <span class="chip">🏷️giver型人格倾向</span>
+          <span class="chip">🏷️idealist倾向</span>
+          <span class="chip">🏷️痴迷型依恋倾向 </span>
+          <span class="chip">🏷️INFP-T</span>
+        </div>
+      </div>
+
+      <div class="poke-sep"><i></i><span class="sep-ball"></span><i></i></div>
+      <div class="card leaf">
+        <h2><span class="mini-ball"></span>基础信息</h2>
+        <div class="rows">
+          <div class="row"><div class="k">活动范围</div><div class="v">日常出没于江南区、青秀区、良庆区</div></div>
+          <div class="row"><div class="k">工作</div><div class="v">私企 软件实施项目的驻场实施PM 工作比较轻松不加班</div></div>
+          <div class="row"><div class="k">家庭</div><div class="v">独子，父在岗，母退休，均身体健康，普通工薪家庭，父母在南宁有养老有住房。</div></div>
+          <div class="row"><div class="k">喜好</div><div class="v">刷B站、看番、种植、游戏、尝试新奇的事物</div></div>
+          <div class="row"><div class="k">社交平台</div><div class="v"><a href="https://space.bilibili.com/3987497" target="_blank" rel="noopener">B站</a> &nbsp; <a href="https://weibo.com/u/5966539512" target="_blank" rel="noopener">微博</a><br>QID：ning589</div></div>
+        </div>
+      </div>
+      <div class="ball-family"><span class="b"></span><span class="b"></span><span class="b"></span><span class="b"></span></div>
+    </section>
+
+    <!-- ========== Tab 2 观念 ========== -->
+    <section class="screen" id="tab-ideas">
+      <div class="card">
+        <h2><span class="mini-ball"></span>写在前面</h2>
+        <ul class="entry-list">
+          <li class="prelude"><button class="entry" type="button" data-tp="tp-preface" data-title="写在前面"><span class="e-ico">📝</span><span class="e-txt">写在前面</span><span class="e-arrow">›</span></button></li>
+        </ul>
+      </div>
+      <div class="poke-sep"><i></i><span class="sep-ball"></span><i></i></div>
+      <div class="card water">
+        <h2><span class="mini-ball"></span>观念和想法</h2>
+        <ul class="entry-list" id="ideaList">
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i1" data-title="我的缺点"><span class="e-ico">⚡</span><span class="e-txt">我的缺点</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i2" data-title="个人觉得算是优点的地方"><span class="e-ico">✨</span><span class="e-txt">个人觉得算是优点的地方</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i3" data-title="性格"><span class="e-ico">🎭</span><span class="e-txt">性格</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i4" data-title="生活习惯"><span class="e-ico">🍳</span><span class="e-txt">生活习惯</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i5" data-title="学习工作和生活"><span class="e-ico">⚖️</span><span class="e-txt">学习工作和生活</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i6" data-title="出现分歧"><span class="e-ico">🌊</span><span class="e-txt">出现分歧</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i7" data-title="出现差异"><span class="e-ico">🧩</span><span class="e-txt">出现差异</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i8" data-title="消费观"><span class="e-ico">💰</span><span class="e-txt">消费观</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i9" data-title="爱和喜欢"><span class="e-ico">❤️</span><span class="e-txt">爱和喜欢</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i10" data-title="恋爱观"><span class="e-ico">💑</span><span class="e-txt">恋爱观</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i11" data-title="婚姻观"><span class="e-ico">💍</span><span class="e-txt">婚姻观</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i12" data-title="家庭观"><span class="e-ico">🏠</span><span class="e-txt">家庭观</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i13" data-title="生育观"><span class="e-ico">🌱</span><span class="e-txt">生育观</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i14" data-title="回复信息"><span class="e-ico">📨</span><span class="e-txt">回复信息</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+          <li class="gated"><button class="entry" type="button" data-tp="tp-i15" data-title="公开关系"><span class="e-ico">🌐</span><span class="e-txt">公开关系</span><span class="e-arrow">›</span><span class="e-lock">🔒</span></button></li>
+        </ul>
+        <p class="gate-tip" id="gateTip"></p>
+      </div>
+    </section>
+
+    <!-- ========== Tab 3 经历 ========== -->
+    <section class="screen" id="tab-story">
+      <div class="card">
+        <h2><span class="mini-ball"></span>经历与成长</h2>
+        <blockquote class="quote">之前的一切经历才造就了现在的自己，不管之前发生的是好的还是不好的事情，自己都能在每段人生经历中学到东西，并且得到成长，我不会忘记前任，但我坚信现任才是最好最合适的</blockquote>
+      </div>
+
+      <div class="poke-sep"><i></i><span class="sep-ball"></span><i></i></div>
+      <div class="card romance">
+        <h2><span class="mini-ball"></span>情感经历</h2>
+        <p class="love-head noindent"><span class="big">谈情说爱亦是修行</span>修识人之智，克经营之艰，成红尘正果。</p>
+        <p class="love-note"><b>首先：</b>情感经历≠恋爱经历</p>
+                <ul class="entry-list">
+          <li><button class="entry" type="button" data-tp="tp-love" data-title="情感经历"><span class="e-ico">🔒</span><span class="e-txt">查看情感经历（需密码解锁）</span><span class="e-arrow">›</span></button></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ========== Tab 4 标签 ========== -->
+    <section class="screen" id="tab-tags">
+      <div class="card">
+        <h2><span class="mini-ball"></span>写在最后</h2>
+        <blockquote class="quote final">我们每一个人，其实都非常渴望被看到，让别人知道自己是多么与众不同的，自己是一个具有独特特征的个体。我希望这些文字能让你看到我所具备的独特之处，期待我的这些特质恰好能吸引你，同时你的特质也能吸引我。</blockquote>
+      </div>
+      <div class="poke-sep"><i></i><span class="sep-ball"></span><i></i></div>
+      <div class="card note-card" id="n1">
+        <h2><span class="mini-ball"></span>痴迷型依恋（焦虑型）</h2>
+        <p>超绝的恋爱脑 这不是一个好的依恋类型，我也想抛弃其中缺点保留优点，但改变行为模式和依恋类型并不容易，所以与我相处需要知道以下四点：1、我自己对感情需求比较高，需要比较多陪伴。2、如果发生矛盾，我更希望通过沟通的方式来解决，通过沟通，我能够越来越清楚你需要什么，我能给你什么，也就越能给你带来你想要的。3、我可能会在情绪上给你一定压力，如果你感受到了，你不要憋着，需要你提醒我。4、我自己有很强的改变意愿，希望能一起成长。求求了别再让我爱上回避型</p>
+      </div>
+      <div class="card note-card" id="n2">
+        <h2><span class="mini-ball"></span>理想主义</h2>
+        <p>虽历经社会的毒打，但我依然心怀理想。拥有理想并不是不好的事情，如果自己都不敢想，并为之去做的话，就不会变得更好。因为理想主义所以我拥有比较强的同理心，我能够批判性思考，我说到做到，我拥有强烈的道德感与责任感，综上原因所以我并不打算改变我的想法，也许今后也不会改变。我有一些观念和想法外人看来太过天真，引用 《葬送的芙莉莲》的一段话：（其实我的内心 从小时候开始就几乎没有改变 只是以理想的大人为目标 装出大人的样子 不断积累到现在而已 我到死前应该都会继续装出大人的样子吧 ）</p>
+      </div>
+      <div class="ball-family"><span class="b"></span><span class="b"></span><span class="b"></span><span class="b"></span></div>
+      <p style="text-align:center;color:var(--muted);font-size:12px;padding:4px 0 8px;">⚡ 自我介绍 暨 相处说明书 ~ App版 ⚡</p>
+    </section>
+
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-tab="tab-home"><span class="ico">🏠</span>主页</button>
+    <button class="tab" data-tab="tab-ideas"><span class="ico">💭</span>观念</button>
+    <button class="tab" data-tab="tab-story"><span class="ico">📖</span>经历</button>
+    <button class="tab" data-tab="tab-tags"><span class="ico">🏷️</span>说明</button>
+  </nav>
+
+  <!-- ===== 全屏子页面 ===== -->
+  <div class="subpage" id="subpage">
+    <header class="subbar">
+      <button class="subback" id="subBack" type="button">‹ 返回</button>
+      <b id="subTitle"></b>
+      <span class="subball"></span>
+    </header>
+    <div class="subcontent" id="subBody"></div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+</div>
+
+  <!-- ===== 子页面内容模板 ===== -->
+  <template id="tp-preface">
+    <div class="card">
+      <h2><span class="mini-ball"></span>写在前面</h2>
+      <p>我为什么想着要写这个：随着年龄的增长，接触的人也越来越多，每每接触新朋友，都要重新讲一遍自己的人生经历以及兴趣爱好，经历越多，故事也就越长。一遍一遍坦诚地向不同的人分享那些过去早已经发生的事和对世界的看法，实在不是一件容易的事，最难受的是当试着分享完过去的经历和对世界的看法以后，发现也不过是个短暂出现的人。重新认识一个人太累了，不停地介绍自己也是。</p>
+      <p>写这些之前我进行了自我剖析，以求能够更了解自己想要什么、需要什么，以及以后希望怎样。我看了不少相关的心理学视频和书籍以完善自己的想法和观念，如阿尔弗雷德·阿德勒的《自卑与超越》、罗兰·米勒的《亲密关系》等。尽管如此我也明白，现在我描述出来的，都只是我自己认知里的自己，和别人眼中的我不一样，还有很多自己没发现的缺点和毛病被忽略了，如果你发现了，我希望你可以直接告诉我！</p>
+      <p>下面是我现阶段的观念和想法，但我没打算用这些内容把自己的想法死死框住，更不想把整个人生都限定在固化的条条框框里。之后随着阅历不断增长、见过更多不同的人和事、拥有更开阔的见识，这些当下的想法肯定还会持续迭代、慢慢调整。</p>
+      <button class="read-done" type="button" id="readDone">✓ 我已读完，返回解锁「观念和想法」</button>
+    </div>
+  </template>
+
+  <template id="tp-i1">
+    <div class="card">
+      <h2><span class="mini-ball"></span>我的缺点</h2>
+<p>"直男思维"，对方的心理感受我可能不能及时地感受到，与人相处过程中会有自以为是的时候，面对没有全面了解或认知之外的事情，喜欢先质疑/反驳，这可能会冒犯到对方，给对方造成不愉快，我真的不是故意的，是生长环境养成的下意识坏行为，我争取能够做到先思考再说话或行动，如果感到不愉快的时候，需要你能明确地提醒我，我愿意思考原因认识错误并做出相应的改变。</p>
+      <p>不太会说话，容易误会，有时候说出来的话，并不是我所想表达的意思，需要重复解释才能完整的表达我想说的。对于这一点我有在看书以求改变《非暴力沟通》《高效演讲》《高情商聊天术》，以及B站上的一些视频。</p>
+      <p>我身高不高，我外貌一般还不怎么会穿搭。</p>
+      <p>心理年龄应该会比我实际年龄要小。</p>
+      <p>从小成长环境很少得到鼓励性反馈，导致的信心不足，很容易受到周围人影响。</p>
+      <p>我大概是有"昆虫恐惧症"，跟齐木楠雄一样，几乎所有昆虫都会让我感到不适，包括蝴蝶在内，南方蟑螂挺常见的，我遇到都是开门赶走，不会去打，真的遇到蟑螂的话，要么能够开门赶走，要么就一直提心吊胆。</p>
+    </div>
+  </template>
+
+  <template id="tp-i2">
+    <div class="card">
+      <h2><span class="mini-ball"></span>个人觉得算是优点的地方</h2>
+<p>对于承诺的事情总会拼尽全力以求说到做到，无论什么原因如果答应的事情做不到我会有强烈的背德感。</p>
+      <p>待人比较真诚，不会从坏的方向去揣测他人，对待事情我比较喜欢从好的方向去看待去理解。</p>
+      <p>遇到问题能够反思，比较善于总结，错了会改，愿意学习，还拥有学习能力，努力改变；挺乐于助人，能帮就帮，不怕麻烦。</p>
+      <p>现在的工作是PM，日常制定计划，协调处理人际关系比较多，相比以前的自己做事更有逻辑性，在计划内会更有规划。</p>
+    </div>
+  </template>
+
+  <template id="tp-i3">
+    <div class="card">
+      <h2><span class="mini-ball"></span>性格</h2>
+<p>说实话，我并不能清楚的认识到我自己是个什么样性格的人，我希望自己能够像夏目贵志那样温柔。我感觉我的脾气还是挺稳定的，虽然有时候跟人因为某些观点的争议激动声音变大，并不是在生气，那只是很想证明自己，就算真的生气了也容易消气。比较感性泪点低。虽不太会主动社交，但表达欲旺盛，很容易与人关系亲近，可能别人会觉得我们关系没有到那个地步。</p>
+    </div>
+  </template>
+
+  <template id="tp-i4">
+    <div class="card">
+      <h2><span class="mini-ball"></span>生活习惯</h2>
+<p>不能吸烟，闻到烟味会难受，会喝酒，平常不会主动去喝酒，在必要的场合能把握好酒量保持清醒状态，酒量还可以，没有喝醉过；睡觉不打呼噜，作息非常灵活，可以天天熬夜两点，也可以早早就睡，一般工作日中午会睡一小时左右的午觉。</p>
+      <p>目前大部分的菜系都能接受，虽然现在还不太会做菜，但是还挺喜欢做菜的，偶尔周末有空会自己做，也会跟着B站学做一些小甜点，虽然除了蛋挞以外的都不怎么成功就是了。</p>
+    </div>
+  </template>
+
+  <template id="tp-i5">
+    <div class="card">
+      <h2><span class="mini-ball"></span>学习工作和生活</h2>
+<p>人为了快乐而生活，但大部分的工作是没办法带来想要的快乐，下班后的生活可以自由支配，并从中获取快乐，在寻求工作与生活平衡的过程中，我更倾向于生活，喜欢更自由更潇洒，不会疯狂内卷但是也不甘于躺平，在提升自己不失去社会价值的同时最大程度享受生活，不给自己施加太多压力，也不会完全放纵，个人定位就是能让自己在50%就够了，这样就很开心很自在。</p>
+    </div>
+  </template>
+
+  <template id="tp-i6">
+    <div class="card">
+      <h2><span class="mini-ball"></span>出现分歧</h2>
+<p>世界上没有完全相同的两个人，即便是同卵双胞胎基因相似、成长环境相近，也难免会发生争吵。在亲密关系里，当出现问题时，既要重视"你"和"我"作为个体的独立性，也要关注"我们"这个整体，我们需要解决问题而不是解决彼此，两个人出现分歧本身并非问题所在，关键在于要看到分歧背后所反映的价值判断。未来争吵时，无论谁对谁错，我都会主动求和，即便存在分歧，也不应逃避沟通，通过有效的沟通，总能找到一个彼此都能接受的解决方案。一旦和好，问题便应视为全部解决，此后绝不允许翻旧账，我属于记好不记仇的类型，不认同"每个瞬间的爆发，都源于过去的日积月累"这类观点。</p>
+    </div>
+  </template>
+
+  <template id="tp-i7">
+    <div class="card">
+      <h2><span class="mini-ball"></span>出现差异</h2>
+<p>在亲密关系中，存在一定的差异是再正常不过的事情。只要双方在基础价值观念上保持一致，那么关系便不会受到太大影响。小时候，我曾天真地以为，只有兴趣爱好相同的人才能成为朋友。如今却发现，只要三观基本契合，有无共同爱好并非关键因素。甚至有时候，不同的爱好和经历反而能为沟通交流增添新奇感。毕竟，产生不同爱好的原因，可能仅仅是因为自己之前未曾接触过。对于对方的爱好，我秉持"我不会，但愿意学；我不喜欢，但愿意接受"的态度，觉得这样的相处方式别具浪漫。当然，如果两个人有更多共同爱好，那自然再好不过，这样不仅能拥有更多共同话题，还能一起做许多有趣的事情。</p>
+    </div>
+  </template>
+
+  <template id="tp-i8">
+    <div class="card">
+      <h2><span class="mini-ball"></span>消费观</h2>
+<p>不超前消费，我秉承着什么样的收入水平对应什么样的消费水平的消费观念（消费水平必须跟经济收入水平一致），在自己留够一定的备用金情况下，遇到喜欢的会果断买，即使买了以后后悔，也不想因为犹豫错过而感到遗憾；不过总的来说我对于消费还是比较理性的。此外我很喜欢尝试新鲜事物，尽管买的东西不划算或者没有用但是也还是喜欢买新奇的东西。</p>
+    </div>
+  </template>
+
+  <template id="tp-i9">
+    <div class="card">
+      <h2><span class="mini-ball"></span>爱和喜欢</h2>
+<p>现在的我认为：我喜欢你不一定就要求你一定也要喜欢我，如果我是爱你的，我就会希望你也是爱我的。喜欢不是唯一，但爱一定是唯一的，我会喜欢很多个明星，爱只会爱一个人；喜欢可以毫无顾忌的去喜欢，爱一定会畅想未来，使未来走的每一步每一个决定都会把对方计划在内。</p>
+    </div>
+  </template>
+
+  <template id="tp-i10">
+    <div class="card">
+      <h2><span class="mini-ball"></span>恋爱观</h2>
+<p>我坦诚地分享我自身条件与恋爱观念，我期望恋爱是建立在双方对彼此条件的接纳，以及在观念上的共鸣的基础上形成相互爱慕的"战友"关系。</p>
+      <p>在感情中我会深入而持久的投入，确认恋爱以后，全心全意地珍视这份感情。恋爱中最宝贵的品质在于，即便发现对方有不足之处，仍能保持一颗包容的心，去发现并欣赏对方的闪光点，相互给予肯定与支持。在这个魔幻又充满挑战的世界里，拥有一个坚定不移的伴侣，拥有抵御孤独的力量。</p>
+      <p>我并不追求一个完美无缺或各方面都能完美互补的伴侣，这样的理想伴侣或许并不存在，倾向于寻找那些观念上大致相同，能让我心生接纳，并愿意携手共度未来人生阶段的人，看重的是双方能否为信任支持和陪伴，物质层面的需求现在的我们各自都有能力去创造和满足，至于其他未提及的条件因素，并不将其视为决定性的考量，因为我相信，随着时间的推移，许多外在条件都有可能发生变化，而真正决定关系长久与否的，往往是双方内心深处的情感联结与相互扶持。</p>
+    </div>
+  </template>
+
+  <template id="tp-i11">
+    <div class="card">
+      <h2><span class="mini-ball"></span>婚姻观</h2>
+<p>我不喜欢传统的嫁娶式的婚姻观，觉得婚姻关系并不是从属关系，而是平等且紧密的合作关系</p>
+      <p>在我看来结婚即是两个人对彼此许下一生一世承诺。我们无法选择原生家庭，伴侣是唯一自己能够选择的家庭成员。</p>
+    </div>
+  </template>
+
+  <template id="tp-i12">
+    <div class="card">
+      <h2><span class="mini-ball"></span>家庭观</h2>
+<p>对于家庭我的看法是：婚姻，是将两个彼此独立家庭变成了三个紧密联系的独立家庭，在小家庭中给予双方父母不管是物质还是陪伴都应该是一样的，我希望对方父母最好也是在广西区内，这样我们能够经常走动方便照顾父母，不过不在也没关系，给予更多关心以平衡因距离产生的影响就好了。</p>
+    </div>
+  </template>
+
+  <template id="tp-i13">
+    <div class="card">
+      <h2><span class="mini-ball"></span>生育观</h2>
+<p>我的原生家庭虽算不上富裕但幸福融洽，我是在父母的爱中降生并成长于这个世界上的。生育是两个人一个家庭的事，所以在双方都做好准备以后，我想要将父母给到我的这份爱继续传承下去，所以希望我的伴侣也能有相同的想法，觉得这份爱可以浓缩，不希望断绝。</p>
+      <p>对于养育，我父母有做得好的地方也有做得不好的地方，正因为我经历过，所以我相信我可以做得更好。</p>
+      <p>话说回来出于私心我是非常想要个可爱的女儿，关于姓氏的话只要名字好听，倒不介意跟谁姓，生育是自己小家庭的选择，如果决定生育作为家庭成员我肯定会做好应尽的责任。</p>
+    </div>
+  </template>
+
+  <template id="tp-i14">
+    <div class="card">
+      <h2><span class="mini-ball"></span>回复信息</h2>
+<p>看到未读消息的红点就会想消灭掉，对于所有人来说我都是看到就回信息。如果自己的信息迟迟得不到回应我大概率会很抓狂，不过真的是自己有其他的事情，自己很忙的话我也完全可以理解，在相处中我会是个话痨，真要聊可以聊一天。</p>
+    </div>
+  </template>
+
+  <template id="tp-i15">
+    <div class="card">
+      <h2><span class="mini-ball"></span>公开关系</h2>
+<p>我想要正式确认恋爱关系一个月内就应该公开，将另一半介绍给亲戚朋友，不喜欢藏着掖着 。</p>
+    </div>
+  </template>
+
+  <template id="tp-love">
+    <div class="card">
+      <div class="love-wrap">
+<div class="love-lock" id="loveLock">
+        <div class="lockball"></div>
+        <p class="tip">这段内容被精灵球封印了 🔒<br>输入正确的密码才能展开</p>
+        <div class="lock-row">
+          <input type="password" id="lovePwd" placeholder="密码" autocomplete="off" inputmode="numeric" maxlength="12" aria-label="情感经历密码">
+          <button type="button" id="loveOk">解锁</button>
+        </div>
+        <p class="lock-err" id="loveErr">密码不对哦，再想想～</p>
+      </div>
+      </div>
+    </div>
+  </template>
+
+<script>
+(function(){
+  // ===== 主标签切换 =====
+  var tabs=document.querySelectorAll('.tabbar .tab');
+  var screens=document.querySelectorAll('.screen');
+  var content=document.querySelector('.content');
+  var phone=document.querySelector('.phone');
+  var subpage=document.getElementById('subpage');
+  var subBack=document.getElementById('subBack');
+  var subTitle=document.getElementById('subTitle');
+  var subBody=document.getElementById('subBody');
+  var toast=document.getElementById('toast');
+  var toastTimer=null;
+  var currentTp=null;
+  function showToast(msg){
+    toast.textContent=msg;toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(function(){toast.classList.remove('show');},2200);
+  }
+  function switchTab(id){
+    closeSub();
+    for(var i=0;i<screens.length;i++){screens[i].classList.toggle('active',screens[i].id===id);}
+    for(var j=0;j<tabs.length;j++){tabs[j].classList.toggle('active',tabs[j].dataset.tab===id);}
+    content.scrollTop=0;
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(){switchTab(this.dataset.tab);});});
+
+  // ===== 阅读门禁：读完「写在前面」返回后解锁 =====
+  var ideasRead=false;
+  try{ideasRead=localStorage.getItem('poke_ideas_read')==='1';}catch(e){}
+  function applyGate(){
+    var list=document.getElementById('ideaList');
+    if(list&&ideasRead){
+      var lis=list.querySelectorAll('li.gated');
+      for(var k=0;k<lis.length;k++){lis[k].classList.add('done');}
+    }
+    var tip=document.getElementById('gateTip');
+    if(tip){tip.textContent=ideasRead?'⚡ 已解锁，点击任意小节阅读':'🔒 请先阅读「写在前面」，读完返回后这里的小节才会解锁';}
+  }
+  applyGate();
+
+  // ===== 全屏子页面 =====
+  var loveHtml=null;
+  function openSub(tpId){
+    var tp=document.getElementById(tpId);
+    if(!tp){return;}
+    currentTp=tpId;
+    var btn=document.querySelector('.entry[data-tp="'+tpId+'"]');
+    subTitle.textContent=btn?btn.getAttribute('data-title'):'';
+    subBody.innerHTML='';
+    subBody.appendChild(tp.content.cloneNode(true));
+    subpage.classList.add('open');
+    phone.classList.add('in-sub');
+    subBody.scrollTop=0;content.scrollTop=0;
+    if(tpId==='tp-love'&&loveHtml){renderLove();}
+  }
+  function closeSub(){
+    if(currentTp==='tp-preface'&&!ideasRead){
+      ideasRead=true;
+      try{localStorage.setItem('poke_ideas_read','1');}catch(e){}
+      applyGate();
+      showToast('⚡ 「观念和想法」已解锁！');
+    }
+    currentTp=null;
+    subpage.classList.remove('open');
+    phone.classList.remove('in-sub');
+    subBody.innerHTML='';
+  }
+  subBack.addEventListener('click',closeSub);
+  document.querySelectorAll('.entry[data-tp]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var li=b.closest('li');
+      if(li&&li.classList.contains('gated')&&!ideasRead){
+        showToast('请先阅读「写在前面」哦～');
+        return;
+      }
+      openSub(b.getAttribute('data-tp'));
+    });
+  });
+
+  // ===== 事件委托：读完返回 / 脚注跳转 / 密码锁 =====
+  document.addEventListener('click',function(e){
+    if(!e.target||!e.target.closest){return;}
+    if(e.target.closest('#readDone')){closeSub();return;}
+    var a=e.target.closest('[data-jump]');
+    if(a){
+      closeSub();
+      switchTab('tab-tags');
+      var el=document.getElementById(a.getAttribute('data-jump'));
+      if(el){setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'});},80);}
+      return;
+    }
+    if(e.target.closest('#loveOk')){tryUnlock();}
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&e.target&&e.target.id==='lovePwd'){e.preventDefault();tryUnlock();}
+  });
+  document.addEventListener('input',function(e){
+    if(e.target&&e.target.id==='lovePwd'){
+      var err=subBody.querySelector('.lock-err');
+      if(err){err.style.display='none';}
+    }
+  });
+  var ENC = "YX1/cG5if357dnpofnkIWVgJDUFEVF8XUl5VRkIKE0VcWhMJ1p6Y0Ym31Yqe0JSODR1HRVBZD9eEutSal9aOodSOhdWOkgMHAQTRjIXYjb7RkIjRqZ3SvaDQq7bRpb3RkL7bib3RuaPQjp3SlZvRkZjSrZrQjbHfhIXbib3Tibjcmo/TiK3RtIbSsIXctLvSlZvXtbPes5HSoofSi6bcmpTSgKzQj7/RtofSsoTRtrDSsrPQq7bRo63RnZDbib3SlIvRqZnTiJTQjbvSt6vQjbrRuaPTr7XSob/RmKbYjb7SvaDQpZrRhb7SubLRqZnRkL7RmKHTibjRvYrTibnRkIjQq7bRpbzSnKXciqnfk5nctbDSibrSv6LSuYLQj7fQj6zSsZbRnInXtbPRrbvQjbHRnZPQjbvfuoPcmpzSlajRn6PTjKHcmo/Yjb7RrpHTiYjSvYXfsYHSqYvSv63RrpHRuLLQjpTQv5vRi6bRrbvTt4jSpprbib3Rg5PShpnRtb3RvYHfsbPRjbnYjb7cvoDfnp/ctbDSibrToa7RgabQj7fYjb7TupzTiYnQjorQrpfdtKLTipfRpb/SrZrTupzetr7Tt4jSob/RsJ3SjbLbib3QtYTRpb/SgbTSvaDTip7Tr7XTjL/TiJ/SubTRibHTi7Tbib3SgYPdtozTib/RkIzRtb3StazQipXTjpzTi7Tbib3fjqvQjozSp67SmZPRsYnRsIDRvbPTjpzTi7TQjbHTiZjRkavSnJTSqa7SoZXXtbMLHl5dCzsXERIUFRELXVsKCUJHUFwUVl1WQkEJF0ZfXhAK0p2b1Yi40Ymd1JeNCR5EQVNaC9S/rNaMvNegh9e0rNmZldqbs9attd2IudSSiNSsmte/oNSovtS4utWusderute7vt6Lvdu0r9mIttq1r9WLq9qakdmYt92Iudazh9eku9asideQsdWPnNS8pNWMndSjldmYrNaMuNmHud2IudSSiNeKvdWLqdWTtd6LvdqDqtSSiNq1v9STmNeRjNSmu9qbvNe/oNeondSal9SUlNiwvdeKvdSTq9aOj9mIjNSFt9SSiNexndi0mdWPqtaMrtu3iNe8o9WPqN6LvdeNg9WPi9SZkdezrte8hdSsgdS9hd6LvdS8pNSHgNqahdWKvtaOs9K3s9eku9eqlNSovNWPsdSYlNe0tNaOj9m9s9eRjNeruNqDqte/oNqbgd6Lvde8ntWNi9qLiNeGs9eRjNSSiNaIr9S4vNSwqt6LvdeSt9eprdSsmte/oNqLiNeGs9eRjNattdqbqN6LvdeRjNSOh9aMuNWLq9e7uNezrt2IudSRs9SqqdSKotSjg9attdS8pNm0jNeQqtant9qTltSOh9aJptWLq9e8hdSSiNWusdSIstSwutattdqbqNSNpdqbkNWLq9qVndaujNWusd6LvdS8pNS4m9qahdSJpteRjNSmu9qbvNmIttS8pBPSlIvQjbvSlZXRmJfTiLnRvLzTib/SvKLQn6XchbnRsLnTvYAV3o6407i31YmR07mm2ZyE0I+g1IuC3LCC1Jy82o271Yq507KE1omt0JSO2LKU07mn1KmE07iH0rK20KG516+R07mm1YmY0LSE1oGP07SV17eW0quz14WV0Yux3o640JWQ15S20K2f1JeN0JWQ1J+S0YqS1KK60JSO1KO+3Z6+17ql2o271JS206+r17ql0Iyk16WC0KGm1JeN3ZCf1quJ0JSO1Y6u0KG717a70quz3o6v3Y6u16qb0Ym31YmJ3KWu2Y2z0quz17ar07Ky3o640Yyr1YqO0qWA1qar07mm17GH0IGx16+R07mm1Iig3Z6S16mA0LuX16q606mJ1Yqg0Kyt1Jyu0quz2ZOc3Y+J2bWe0IaG1qiw0Ker156W1rG1DR1YXA89ERIUFREXDV5dCw1EQVNaFVJbUEFHCBNAWV0WC9abndaMvNWPm9eRjA0YQkJVWw8FAQMH0IiD3o64ZGDeqLbciqDQq7bQj4vfn5bcmrfQq7bbib3TibLRibHSlrnSvaDSiITQjbzSp67SmZPSlIvbib3SlIvRjIfTib/SibPTi5zQjK7Tib/QianQlrLbib3SlIvQjYrSu5rSu5TfjqPSvaDTi7TckpLRuaPbib3es5HSoofSsavSvaDemqrQjbjYjb7RkIjfsaLRirLSoZ7SvaDfnobRmJfTiJLQjbvesLXRvYHQq7bRu7rSu6nbib3SobzSqJTYjb7RkIjfkJrTrIzYjb7SvaDSgYPStoLQrLLcmqTTibLcmqTSoZXbib3ftpjRgoDSjKHSoofRg5PSqbjftpjRgoDSp67SmZPQq7bQj4vUsbDRvbfRuLnRu67SqpLSrZ7SrZrSvaDTibjRkZbSnJTRpb/Yjb7RrpHTiYjRibPSrYLTr7XStIHThorYjb7RuqDQpa3QjbzSgaPQj7rRsrfSrZ7RuaPQjbzfso/RurvRpoTTr7XStojTu4HSrZrRkIjerJDRvLzYjb7RkIjRv5fckpfStITQjqfTi4jQj7/RqZ3cgq7SuZnQj4vSrZrQjbHfhIXQj7fUsbDciqjRn4fSubDQip/Qj7fSlZXSk7PTibLRjIXUsbDTjr7fjrXciqjRn4fStLrQuYPSvaDSgYPSrb/QkJzRqYHQrpfdtKLYjb7SvaDSgYPSrZ7TiZjStLrQuYPcsaDYjb7QjbHRppTRo63RnZDQjbvTi7Tbib3SgYPRi7neq4zSoY/SjbHbib3SrZrRkZbSnJTRibPSrYLSqa7epobSvaDTjajRhbfTibLRuLvQq7bToa7RhYncgYjQiqvRkIjYjb7SvaDTipfQjYvRuaPQjqnStojRhYDTjajSqbjSqqzSv5TYjb7SvaDRsbzQjLnRkYXRmojSj7fRvZrTi4jRvZrTi4jRhYDRsbzQjLnRkYXRmojSj7fSvaDYjb7Tjr7RhLzTr7XRpZ3SubDQirrTnIfRqZ3SmqXTib/cirbeqJjQiYXYjanciqjRn4fRvbfRuLnRmojRuaPRiIDSor/RgpnSlZXbib3TjI3Ru67RrZ7RkafSoaPRibHRraXTr7XRuaPQjbzSt7/QjYrSu5rTr7XSv4nTkY/Ti5bbib3SjKHSoofQq7bSvaDfn5bcmrfSuYLQj4veqLfRsILQgonTr7XftbTRiYDRsZXbib3flrvRi6bStIHThorQq7bTo77Ql4nRkIzRn7ndsIbYjb7SvLHTipfTkY/Ti5bRqbnSnKLQjK7SjbLRkrrSvqrRi6bfh7jSqJTfh7jRhb7UsbAIGl1eDzgUFREXERIIWVgJDUFEVF8XUl5VRkIKE0VcWhMJ1p6Y0Kqs1Yqe0JSODR1HRVBZDwAEBwPSiIYFBderud2IudSSiNSsmlPQmqvRuLLQg7vRhb7TiYnSp5zYjb7SvaDRg5PSqbjQiqvRkIjSuYXcirbQlY7TvJjYjb7QiLfRqZ3QjK7fn4rSrZ7RuaPQjbvQvp/QjbzSjqvctozSla3QjbHQqobdrJvSlIvctLvSlZvRpZbYjb7SvLHTipfRkIjSu5LQj7fRuaPRi5/TjpPbib3TibnSp5zTipfRpb/SlIvQi6zQtYTQiavTiYnRv5nRuIzSvaDfsLjRkZjYjb7SvKLRiYrSvb7UsbDSvaDQv5vdrrHenLDbib3SlIvRhYDSv4nRmJfTi7Tcgq7RuaPTu5jYjb7cgq7SlIvTr7XfuYLdoI7Tip7QjbHfhIXSvKLRiYrSvb7RpoTRkIjTiK3SvrjTibjSvaDYjb7ciqnSvKfTvp3Qq7bcgq7RuaPRibHfnp/dqoLYjb7ciqjfn5vSvaDRta3RuqbSuYLQj7fSsL3TvYDYjb7Qj7/RqZ3RqZnRuaPQjYrSu5rclJnQqI/Rpb/Ti5bRi7HUsbDQjbzfjrXciqjRn4fStLrQuYPRqZnRvbPTjpzTi7QH0Ymd16680KG53o6407mm1IKF3ZOcE9SimNSDp9eIutS/t9S9vhPSpJTbibDRuaPStoLSvp3ctozRqZ3RrpHTiYjStLrQuYPcsaDTjK7TkK7Yjb7RqZnRsLnTvYDTipfRpb/fn5vRkIjRta3RuqbSuYLQj7fSv7nRv6rSoZXbia4V16SZ0IWh1I670Lmx17u/F9arrtWusdSJudWjrtm8l9Wusd6LvdaMuNaZkNe7pNajrtaPtdWOudWusd6LvdSovNWMsdaNvdS4qdShsNe/p9q0sNe0gtSHoNe/oNWoqtattdeMuderqtaPjtWKpNaOvte0tNu3iNm0jNeQqtSSjNeRiNattdSGqti3q9G0tw0YXVsKPxEXERIUFQ1bWAwIRkFWXxJXWVBEQg8WQllYEwzTmZ3Ti6bQjZvSlIsIGkJHUFwKBwEFAteNgQnRrbrbib3SlIvQjYrSu5rSu5TfjqPQj7fflpHSvaDYjb7SvaDRg5PStoLSuYLTr7XRqZ3RkIjQjonRm73RuaPSvLHRrbvTr7XSu5rStbDTibzcm4HSjKfbib3SgYPRupvTiYjSroXTi7TckpLRuaPbib3RuaPQjp3fsLjRkZjSj7rSv6TQjarbib3SrZrcgq7SlIvctLvSlZvQjZzRuaPRuqDQv4LSvaDfnobcirbQq7bRhb7Ti7nStrTSlIvdtozfso/SjbTRqILTr7Xfn4LRi6bUsbDRkIjSp67SmZPRuaPbib3fn5bcmrfRg5PRkavTiLfRkIjTj43dop/RuaPRvYHSi6fRo63Tib/Ro63RnZDRkIjYjb7SvaDRuo3QjbzStrTbib3fqI/TsYffhq3RkIjfsLjRkZjTiK3SuYvRtbvRiprQq7bbib3TjLTSrZ7SjKHSoofRg5PSqbjflrPcirberJDbib3Tib/cirbRuaPSsa7SuYLRkIjSj7rTqLHRsZfTlJ/fn5bRsILQgonbib3RuaPSrZ7Sj7rRm4jRqaHSsa7Su5rTr7XTi4jbib3RuLLQjpTSgYPRpZ3SlIvTr7XfnqfQjbHfnqfRpZbYjb7Qj7/RqZ0W0YuT1Iy0F9WNt92IudS4ntSsmtSrmdS8pNWMndqTtNiqk9aPkNSnv92IudSSiNeEhNSmu9qbvNe/oNeRjNWMutSwute/oNqOnticqdaMuNSTrtufrd6LvdSGlNeruNqOnticqdeDm96Lvde7n9e7sNWPmNWNt9aMtdSmmdaKitaMotSpqtWNt92IrtSnv9SpkNmQuNeKotmYpNaMtdmYpNWusdSIstS0tNmArtS8pNe5lNqTk9e/oNeEhNWPvNeOodmYlNWZodSNpdWusd6Lvde8ntWNi9e7mtWMlNqboNWPsdqboN6LvdS8pNS6hde1r9WPvNe8hd6LvdeSt9eprdeJptS/rNSGlNaapdeOodattdqbqN6Lvdu2ltWOudqLrdevnteKvdSSjNWusderute7vtSnltG0tw0YXVsKPxEXERIUFQ1bWAwIRkFWXxJXWVBEQg8WQllYEwzTmZ3StJ/QjZvSlIsIGkJHUFwKBwEFBdeNgQbRrbrbib3QqorRkbXTiZ/RqZnRg5PSqbjSuYLRpbnesbDTr7XRpoTRtajYjb7SvaDSgYPRgoPQir3cirbSubTRqYHSrZrSsb7SlIvbib3TjajTsZffqKPbib3QqorRkbXTiZ/QjK7SsKjQj7fTib/RhaDRtajclZPTi7nStrTUsbDQjbzQrpfdtKLRqZ3RrpHTiYjSvaDTib/Rka7TjarTkrHfjqrSrZ7SqpLQjYvSlZjcirbTi7zTkp7Rr7PRpaLSuYLRkIjTi7Tbib3RrbLRpb/RuaPcl5rSlIvSvqPQiq/Qj7fYjanciqjRnZPTjr7Sv7TQjZzRuaPQiavSiYrRjYnRta3ckrjSuYLcspvShoPRkZvRsoHck7DTibLQjZvRv5XRvYfTib/Qj7fQq7bTjqLRr67ctb3Rta3RvYHQpqncvpfYjb7RrpHTiYjciqjTio/Ssa7flrvcg7vSvqPQjbzfso/SvaHTiYjcspvShoPbib3RuLLQjpTSvp3ctozSsKjQj7fSj7rRkavepavQj7rYjb7cmoXTi7TRi7nSlajdoajfnq/XtbPRrZjSqJTSrZrQjb/Ti4jTronSlbbQjZzRuaPStoLRuaPSroXSi6bcmpTSsKjRvYEXE9aLm9mNmtaMj9SyudG0t9Syudqzn9a/gN2IudajgNW8hNS4u9aOj9K3s9exvdmwm9eIj96LvdWghNSLi9q5ntWNi9G0txMLHl5dCzsXERIUFRELXVsKCUJHUFwUVl1WQkEJF0ZfXhAK0p2b1Yq30Ymd1JeNCR5EQVNaCwMHAwfRjIUGA9Sovd6LvdeRjNS2q9qAl9S9kNeDkNWKrdeKvdSIqN2IudWKt9SsmtSxvNeLrNWOrtSwitezvtqBgde/oNWusdaNl92IudSSiNSwitezvtStr9WPu9utn9e/oNezj9eqlNu0rtWPsdu0rtazh9eku9SxvNevq9S5ite+lda4nN2Iude/oNeiqdebk9eRjNSYiNS8pNattdutn9WLhd2Iudium9S8pNS5itW8mdSGgNaPtdWOudWusd6LvdS8pNmIqdeiqdebk9eRjNmZldWoqtegh9e0rNattdSUgtSaod2IudevntS8pNWPite+ndmWmdWtiNattd2IudSrmdaMtdmChtaPkNSnv92Iude/oNaPmdattdqDqNaRitqtiNazh9aMuNmIrd2IudWKt9qTtNiqk9qCv9eqlNqCv9SHoN2Iude/oNSGlNeruNq3iNSTrtebqtmQuNeRjNattdS3hteEpN2IudSSiNWusdiWj9qtpN6LvdeJptegh9S8pNS4m9uVi9S4u9S8pNmwm9eDhNattdS3hteEpN2IudS4m9qTvNSJpteRjNWPvNqTtNe/oN2Iude+sdaPkNealNSZkNaDltu0id6LvdS8pNeFkNSovNm0jNeQqtS4u9Sjg9SrgdWovtS/gdaMkdWPm9aOj9asideQsdWPnNeRjNezrte7otS/gdWusdiWj9qtpN6LvdSGlNeruNSovNeiude7v9egh9eohdSYrtqTvNS/gdeRjNattdS3hteEpNeNg9ant9qTltSSiNWusdezrte7ot6LvdWPrNSSiNeMk9eqlNaOs9S5ute+rt6LvdS8pNaolNu1ptSSiNeFq9WNv9evq9i2jteqvtWJrNS1vt6LvdS8pNSskdaMj9eFkNq3iNS4oNW6hdSOh9e7v9egh9qTltSxgteRjNattdujm9iVqd2Iude+sdaPkNe/oNqWntSSiNqTltSxgtaOs9K3sw4bWVgJ";
+
+  // ===== 情感经历密码锁（子页面内）=====
+  function decrypt(pwd){
+    try{
+      var raw=atob(ENC);
+      var bytes=new Uint8Array(raw.length);
+      for(var i=0;i<raw.length;i++){bytes[i]=raw.charCodeAt(i)^pwd.charCodeAt(i%pwd.length);}
+      return new TextDecoder("utf-8").decode(bytes);
+    }catch(e){return null;}
+  }
+  function renderLove(){
+    var wrap=subBody.querySelector('.love-wrap');
+    if(wrap&&loveHtml){wrap.innerHTML=loveHtml;}
+  }
+  function tryUnlock(){
+    var input=subBody.querySelector('#lovePwd');
+    if(!input){return;}
+    var lock=subBody.querySelector('.love-lock');
+    var err=subBody.querySelector('.lock-err');
+    var pwd=input.value.trim();
+    if(!pwd){input.focus();return;}
+    var text=decrypt(pwd);
+    if(text&&text.indexOf("POKE_UNLOCK_OK")===0){
+      loveHtml='<ol class="love">'+text.slice(14)+'</ol>';
+      renderLove();
+      showToast('🔓 精灵球打开啦！');
+    }else{
+      if(err){err.style.display='block';}
+      if(lock){lock.classList.remove('shake');void lock.offsetWidth;lock.classList.add('shake');}
+      input.select();
+    }
+  }
+})();
+</script>
+</body>
+</html>
