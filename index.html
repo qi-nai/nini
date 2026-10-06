@@ -225,6 +225,16 @@
     font-size:14px;font-weight:700;color:var(--accent-deep);line-height:1.45;
   }
   .nav-btn:active{background:#ffe9d2;}
+  .sub-nav.first{justify-content:center;}
+  .sub-nav.first .nav-btn{
+    flex:none;min-width:58%;align-items:center;text-align:center;
+  }
+  .nav-btn.back{
+    align-items:center;text-align:center;justify-content:center;
+    background:linear-gradient(135deg,#fff7d6,#ffeeb0);
+    border:1.5px solid var(--poke-yellow-deep);
+  }
+  .nav-btn.back .nb-txt{color:var(--accent-deep);}
 
   .toast{
     position:absolute;left:50%;bottom:calc(104px + env(safe-area-inset-bottom));
@@ -760,17 +770,23 @@
     var idx=-1;
     for(var i=0;i<IDEA_ORDER.length;i++){if(IDEA_ORDER[i].tp===tpId){idx=i;break;}}
     if(idx<0){return;}
-    var prev=IDEA_ORDER[(idx-1+IDEA_ORDER.length)%IDEA_ORDER.length];
-    var next=IDEA_ORDER[(idx+1)%IDEA_ORDER.length];
     var nav=document.createElement('div');
-    nav.className='sub-nav';
-    nav.innerHTML=
-      '<button class="nav-btn prev" type="button" data-nav="'+prev.tp+'">'+
-        '<span class="nb-lab">‹ 上一节</span><span class="nb-txt">'+prev.title+'</span>'+
-      '</button>'+
-      '<button class="nav-btn next" type="button" data-nav="'+next.tp+'">'+
-        '<span class="nb-lab">下一节 ›</span><span class="nb-txt">'+next.title+'</span>'+
-      '</button>';
+    nav.className='sub-nav'+(idx===0?' first':'');
+    var html='';
+    if(idx>0){
+      var prev=IDEA_ORDER[idx-1];
+      html+='<button class="nav-btn prev" type="button" data-nav="'+prev.tp+'">'+
+        '<span class="nb-lab">‹ 上一节</span><span class="nb-txt">'+prev.title+'</span></button>';
+    }
+    if(idx<IDEA_ORDER.length-1){
+      var next=IDEA_ORDER[idx+1];
+      html+='<button class="nav-btn next" type="button" data-nav="'+next.tp+'">'+
+        '<span class="nb-lab">下一节 ›</span><span class="nb-txt">'+next.title+'</span></button>';
+    }else{
+      html+='<button class="nav-btn next back" type="button" data-nav-back="1">'+
+        '<span class="nb-txt">‹ 返回</span></button>';
+    }
+    nav.innerHTML=html;
     subBody.appendChild(nav);
   }
 
@@ -820,6 +836,7 @@
     if(e.target.closest('#readDone')){closeSub();return;}
     var nb=e.target.closest('[data-nav]');
     if(nb){openSub(nb.getAttribute('data-nav'));return;}
+    if(e.target.closest('[data-nav-back]')){closeSub();return;}
     var a=e.target.closest('[data-jump]');
     if(a){
       closeSub();
