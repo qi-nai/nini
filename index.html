@@ -130,6 +130,8 @@
     color:var(--accent-deep);font-weight:700;font-size:13px;
     padding:5px 12px;border-radius:999px;
   }
+  .stat-row + .stat-row{margin-top:8px;}
+  .row .v.hobby{line-height:1.8;}
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;justify-content:center;}
   .chip{
     background:linear-gradient(135deg,#ffe14d,#ffcb05);
@@ -205,6 +207,25 @@
     scrollbar-width:none;
   }
   .subcontent::-webkit-scrollbar{display:none;}
+
+  /* ===== 上一节 / 下一节 跳转 ===== */
+  .sub-nav{display:flex;gap:10px;margin-top:14px;}
+  .nav-btn{
+    flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;
+    background:#fffaf2;border:1.5px solid var(--line);border-radius:12px;
+    padding:10px 12px;cursor:pointer;font-family:inherit;
+    box-shadow:0 2px 8px rgba(180,40,20,.06);
+  }
+  .nav-btn.prev{align-items:flex-start;text-align:left;}
+  .nav-btn.next{align-items:flex-end;text-align:right;}
+  .nav-btn .nb-lab{
+    font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.04em;line-height:1.4;
+  }
+  .nav-btn .nb-txt{
+    font-size:14px;font-weight:700;color:var(--accent-deep);line-height:1.45;
+  }
+  .nav-btn:active{background:#ffe9d2;}
+
   .toast{
     position:absolute;left:50%;bottom:calc(104px + env(safe-area-inset-bottom));
     transform:translateX(-50%) translateY(10px);
@@ -420,9 +441,13 @@
         <h1><span class="bolt">⚡</span>自我介绍 暨 相处说明书<span class="bolt">⚡</span></h1>
         <p class="sub">关于我，以及我想让你知道的那些事</p>
         <div class="stat-row">
-          <span class="stat">♂️ 1995/8</span>
-          <span class="stat">163CM 63KG</span>
-          <span class="stat">广西 南宁</span>
+          <span class="stat">♂️</span>
+          <span class="stat">南宁</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat">1995年8月</span>
+          <span class="stat">163cm</span>
+          <span class="stat">63kg</span>
         </div>
         <p class="sub" style="margin:10px 0 0;">人是非常复杂的，标签虽不完全准确，但标签还是能够方便认清自己也方便他人了解自己。</p>
         <div class="chips">
@@ -440,8 +465,8 @@
           <div class="row"><div class="k">活动范围</div><div class="v">日常出没于江南区、青秀区、良庆区</div></div>
           <div class="row"><div class="k">工作</div><div class="v">私企 软件实施项目的驻场实施PM 工作比较轻松不加班</div></div>
           <div class="row"><div class="k">家庭</div><div class="v">独子，父在岗，母退休，均身体健康，普通工薪家庭，父母在南宁有养老有住房。</div></div>
-          <div class="row"><div class="k">喜好</div><div class="v">刷B站、看番、种植、游戏、尝试新奇的事物</div></div>
-          <div class="row"><div class="k">社交平台</div><div class="v"><a href="https://space.bilibili.com/3987497" target="_blank" rel="noopener">B站</a> &nbsp; <a href="https://weibo.com/u/5966539512" target="_blank" rel="noopener">微博</a><br>QID：ning589</div></div>
+          <div class="row"><div class="k">喜好</div><div class="v hobby">刷B站、看番、种植、游戏<br>尝试新奇的事物</div></div>
+          <div class="row"><div class="k">社交平台</div><div class="v"><a href="https://space.bilibili.com/3987497" target="_blank" rel="noopener">B站</a> &nbsp; <a href="https://weibo.com/u/5966539512" target="_blank" rel="noopener">微博</a>，（其他平台同名）<br>QID：ning589</div></div>
         </div>
       </div>
       <div class="ball-family"><span class="b"></span><span class="b"></span><span class="b"></span><span class="b"></span></div>
@@ -725,6 +750,30 @@
   }
   applyGate();
 
+  // ===== 观念小节：上一节 / 下一节 =====
+  var IDEA_ORDER=[];
+  document.querySelectorAll('#ideaList .entry[data-tp]').forEach(function(b){
+    IDEA_ORDER.push({tp:b.getAttribute('data-tp'),title:b.getAttribute('data-title')||''});
+  });
+  function appendIdeaNav(tpId){
+    if(IDEA_ORDER.length<2){return;}
+    var idx=-1;
+    for(var i=0;i<IDEA_ORDER.length;i++){if(IDEA_ORDER[i].tp===tpId){idx=i;break;}}
+    if(idx<0){return;}
+    var prev=IDEA_ORDER[(idx-1+IDEA_ORDER.length)%IDEA_ORDER.length];
+    var next=IDEA_ORDER[(idx+1)%IDEA_ORDER.length];
+    var nav=document.createElement('div');
+    nav.className='sub-nav';
+    nav.innerHTML=
+      '<button class="nav-btn prev" type="button" data-nav="'+prev.tp+'">'+
+        '<span class="nb-lab">‹ 上一节</span><span class="nb-txt">'+prev.title+'</span>'+
+      '</button>'+
+      '<button class="nav-btn next" type="button" data-nav="'+next.tp+'">'+
+        '<span class="nb-lab">下一节 ›</span><span class="nb-txt">'+next.title+'</span>'+
+      '</button>';
+    subBody.appendChild(nav);
+  }
+
   // ===== 全屏子页面 =====
   var loveHtml=null;
   function openSub(tpId){
@@ -735,6 +784,7 @@
     subTitle.textContent=btn?btn.getAttribute('data-title'):'';
     subBody.innerHTML='';
     subBody.appendChild(tp.content.cloneNode(true));
+    if(tpId.indexOf('tp-i')===0){appendIdeaNav(tpId);}
     subpage.classList.add('open');
     phone.classList.add('in-sub');
     subBody.scrollTop=0;content.scrollTop=0;
@@ -768,6 +818,8 @@
   document.addEventListener('click',function(e){
     if(!e.target||!e.target.closest){return;}
     if(e.target.closest('#readDone')){closeSub();return;}
+    var nb=e.target.closest('[data-nav]');
+    if(nb){openSub(nb.getAttribute('data-nav'));return;}
     var a=e.target.closest('[data-jump]');
     if(a){
       closeSub();
